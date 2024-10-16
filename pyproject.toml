@@ -16,6 +16,7 @@ pydantic-settings = "^2.4.0"
 pyjwt = "^2.9.0"
 python-multipart = "^0.0.9"
 sqlalchemy = "^2.0.32"
+fastapi-keycloak-middleware = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.1"
