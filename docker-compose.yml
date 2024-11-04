@@ -56,7 +56,8 @@ services:
     ports:
       - ${KC_PORT}:8080
     volumes:
-      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json:ro
+      - ./keycloak/grafana-realm.json:/opt/keycloak/data/import/grafana-realm.json:ro
+      - ./keycloak/fastapi-realm.json:/opt/keycloak/data/import/fastapi-realm.json:ro
     env_file:
       - .env
     depends_on:

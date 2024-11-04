@@ -1,0 +1,67 @@
+{
+  "id": "fastapi",
+  "realm": "fastapi",
+  "sslRequired": "none",
+  "enabled": true,
+  "eventsEnabled": true,
+  "eventsExpiration": 900,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true,
+  "attributes": {
+    "adminEventsExpiration": "900"
+  },
+  "clients": [
+    {
+      "clientId": "api",
+      "name": "FastAPI Application",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KEYCLOAK__CLIENT_SECRET}",
+      "redirectUris": [
+        "${DATABASE__HOSTNAME}:8000/*"
+      ],
+      "webOrigins": [
+        "${DATABASE__HOSTNAME}:8000"
+      ],
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "api-swaggerui",
+      "name": "FastAPI Swagger UI",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "${DATABASE__HOSTNAME}:8000/docs/oauth2-redirect"
+      ],
+      "webOrigins": [
+        "${DATABASE__HOSTNAME}:8000"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "email": "testuser@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "testpass123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["default-roles-fastapi"]
+    }
+  ]
+} 
