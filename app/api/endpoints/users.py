@@ -3,9 +3,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
-from app.core.security.password import get_password_hash
 from app.models import User
-from app.schemas.requests import UserUpdatePasswordRequest
 from app.schemas.responses import UserResponse
 
 router = APIRouter()
@@ -31,16 +29,3 @@ async def delete_current_user(
     await session.commit()
 
 
-@router.post(
-    "/reset-password",
-    status_code=status.HTTP_204_NO_CONTENT,
-    description="Update current user password",
-)
-async def reset_current_user_password(
-    user_update_password: UserUpdatePasswordRequest,
-    session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(deps.get_current_user),
-) -> None:
-    current_user.hashed_password = get_password_hash(user_update_password.password)
-    session.add(current_user)
-    await session.commit()

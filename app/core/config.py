@@ -25,11 +25,6 @@ PROJECT_DIR = Path(__file__).parent.parent.parent
 
 
 class Security(BaseModel):
-    jwt_issuer: str = "my-app"
-    jwt_secret_key: SecretStr
-    jwt_access_token_expire_secs: int = 24 * 3600  # 1d
-    refresh_token_expire_secs: int = 28 * 24 * 3600  # 28d
-    password_bcrypt_rounds: int = 12
     allowed_hosts: list[str] = ["localhost", "127.0.0.1"]
     backend_cors_origins: list[AnyHttpUrl] = []
 
@@ -42,9 +37,18 @@ class Database(BaseModel):
     db: str = "postgres"
 
 
+class KeycloakSettings(BaseModel):
+    server_url: str
+    realm: str
+    client_id: str
+    client_secret: str
+    swagger_client_id: str
+
+
 class Settings(BaseSettings):
     security: Security
     database: Database
+    keycloak: KeycloakSettings
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -62,6 +66,8 @@ class Settings(BaseSettings):
         env_file=f"{PROJECT_DIR}/.env",
         case_sensitive=False,
         env_nested_delimiter="__",
+        # allow extra env variables
+        extra="allow",
     )
 
 
