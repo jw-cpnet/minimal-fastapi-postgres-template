@@ -18,10 +18,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "${KEYCLOAK__CLIENT_SECRET}",
       "redirectUris": [
-        "${DATABASE__HOSTNAME}:8000/*"
+        "http://${DATABASE__HOSTNAME}:8000/*"
       ],
       "webOrigins": [
-        "${DATABASE__HOSTNAME}:8000"
+        "http://${DATABASE__HOSTNAME}:8000"
       ],
       "publicClient": false,
       "protocol": "openid-connect",
@@ -35,10 +35,10 @@
       "enabled": true,
       "publicClient": true,
       "redirectUris": [
-        "${DATABASE__HOSTNAME}:8000/docs/oauth2-redirect"
+        "http://${DATABASE__HOSTNAME}:8000/docs/oauth2-redirect"
       ],
       "webOrigins": [
-        "${DATABASE__HOSTNAME}:8000"
+        "http://${DATABASE__HOSTNAME}:8000"
       ],
       "protocol": "openid-connect",
       "attributes": {
