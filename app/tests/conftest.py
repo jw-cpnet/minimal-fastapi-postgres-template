@@ -5,24 +5,22 @@ from collections.abc import AsyncGenerator
 import pytest
 import pytest_asyncio
 import sqlalchemy
+from fastapi_keycloak_middleware import FastApiUser
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core import database_session
 from app.core.config import get_settings
-from app.core.security.jwt import create_jwt_token
-from app.core.security.password import get_password_hash
 from app.main import app as fastapi_app
-from app.models import Base, User
 
+# Remove JWT and password related imports and variables
 default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
 default_user_email = "geralt@wiedzmin.pl"
-default_user_password = "geralt"
-default_user_access_token = create_jwt_token(default_user_id).access_token
+default_user_first_name = "Geralt"
+default_user_last_name = "of Rivia"
 
+# Mock Keycloak token
+default_user_access_token = "mock_keycloak_token"
 
 # @pytest.fixture(scope="session")
 # def event_loop_policy():
@@ -82,11 +80,6 @@ async def fixture_clean_get_settings_between_tests() -> AsyncGenerator[None, Non
     get_settings.cache_clear()
 
 
-@pytest_asyncio.fixture(name="default_hashed_password", scope="session")
-async def fixture_default_hashed_password() -> str:
-    return get_password_hash(default_user_password)
-
-
 @pytest_asyncio.fixture(name="session", scope="function")
 async def fixture_session_with_rollback(
     monkeypatch: pytest.MonkeyPatch,
@@ -122,22 +115,14 @@ async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient, N
 
 
 @pytest_asyncio.fixture(name="default_user", scope="function")
-async def fixture_default_user(
-    session: AsyncSession, default_hashed_password: str
-) -> AsyncGenerator[User, None]:
-    default_user = User(
+async def fixture_default_user() -> FastApiUser:
+    return FastApiUser(
+        first_name=default_user_first_name,
+        last_name=default_user_last_name,
         user_id=default_user_id,
-        email=default_user_email,
-        hashed_password=default_hashed_password,
     )
-    session.add(default_user)
-
-    await session.commit()
-    await session.refresh(default_user)
-
-    yield default_user
 
 
 @pytest_asyncio.fixture(name="default_user_headers", scope="function")
-def fixture_default_user_headers(default_user: User) -> dict[str, str]:
+def fixture_default_user_headers() -> dict[str, str]:
     return {"Authorization": f"Bearer {default_user_access_token}"}

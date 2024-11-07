@@ -4,8 +4,9 @@ from httpx import AsyncClient
 
 from app.main import app
 from app.tests.conftest import (
-    default_user_email,
+    default_user_first_name,
     default_user_id,
+    default_user_last_name,
 )
 
 
@@ -32,5 +33,8 @@ async def test_read_current_user_response(
 
     assert response.json() == {
         "user_id": default_user_id,
-        "email": default_user_email,
+        "first_name": default_user_first_name,
+        "last_name": default_user_last_name,
+        "display_name": f"{default_user_first_name} {default_user_last_name}",
+        "email": "",  # or mock an email if needed
     }
