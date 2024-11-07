@@ -27,14 +27,13 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 
 # Create a formatting configuration
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 console_handler.setFormatter(formatter)
 
 # Add the handlers to the logger
 fastapi_logger.addHandler(file_handler)
 fastapi_logger.addHandler(console_handler)
-
 
 
 # Set up Keycloak configuration
@@ -45,7 +44,9 @@ keycloak_config = KeycloakConfiguration(
     client_secret=get_settings().keycloak.client_secret,
     swagger_client_id=get_settings().keycloak.swagger_client_id,
 )
-fastapi_logger.debug(f"Keycloak config: URL={keycloak_config.url}, Realm={keycloak_config.realm}, Client ID={keycloak_config.client_id}, Swagger Client ID={keycloak_config.swagger_client_id}")
+fastapi_logger.debug(
+    f"Keycloak config: URL={keycloak_config.url}, Realm={keycloak_config.realm}, Client ID={keycloak_config.client_id}, Swagger Client ID={keycloak_config.swagger_client_id}"
+)
 
 app = FastAPI(
     title="minimal fastapi postgres template with Keycloak",
@@ -86,11 +87,10 @@ app.add_middleware(
     allowed_hosts=get_settings().security.allowed_hosts,
 )
 
+
 @app.get("/")
 async def root(user: User = Depends(get_user)):
     return {"message": f"Hello, {user.name}!"}
-
-
 
 
 # After setting up the app and middleware
