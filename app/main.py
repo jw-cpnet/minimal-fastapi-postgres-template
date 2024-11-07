@@ -64,11 +64,14 @@ app = FastAPI(
 
 
 async def custom_user_mapper(userinfo: dict[str, Any]) -> FastApiUser:
-    return FastApiUser(
+    user = FastApiUser(
         first_name=userinfo.get("given_name", ""),
         last_name=userinfo.get("family_name", ""),
         user_id=userinfo["sub"],  # This is the unique user ID from Keycloak
     )
+    # Add email as a custom attribute
+    setattr(user, "email", userinfo.get("email", ""))
+    return user
 
 
 # Add Keycloak middleware

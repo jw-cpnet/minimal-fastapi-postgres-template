@@ -18,3 +18,4 @@ class UserResponse(BaseResponse):
     first_name: str
     last_name: str
     display_name: str
+    email: str
