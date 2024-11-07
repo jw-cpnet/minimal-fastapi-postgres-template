@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from fastapi import Depends, FastAPI
 from fastapi.logger import logger as fastapi_logger
@@ -6,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi_keycloak_middleware import (
+    FastApiUser,
     KeycloakConfiguration,
     get_user,
     setup_keycloak_middleware,
@@ -13,7 +15,6 @@ from fastapi_keycloak_middleware import (
 
 from app.api.api_router import api_router
 from app.core.config import get_settings
-from app.models import User
 
 logging.basicConfig(level=logging.DEBUG)
 fastapi_logger.setLevel(logging.DEBUG)
@@ -35,6 +36,7 @@ console_handler.setFormatter(formatter)
 fastapi_logger.addHandler(file_handler)
 fastapi_logger.addHandler(console_handler)
 
+logging.getLogger("fastapi_keycloak_middleware").setLevel(logging.DEBUG)
 
 # Set up Keycloak configuration
 keycloak_config = KeycloakConfiguration(
@@ -43,6 +45,8 @@ keycloak_config = KeycloakConfiguration(
     client_id=get_settings().keycloak.client_id,
     client_secret=get_settings().keycloak.client_secret,
     swagger_client_id=get_settings().keycloak.swagger_client_id,
+    verify=False,
+    audience=["account", "api"],
 )
 fastapi_logger.debug(
     f"Keycloak config: URL={keycloak_config.url}, Realm={keycloak_config.realm}, Client ID={keycloak_config.client_id}, Swagger Client ID={keycloak_config.swagger_client_id}"
@@ -56,6 +60,17 @@ app = FastAPI(
     docs_url="/docs",
 )
 
+# Add this after the keycloak_config definition but before setup_keycloak_middleware
+
+
+async def custom_user_mapper(userinfo: dict[str, Any]) -> FastApiUser:
+    return FastApiUser(
+        first_name=userinfo.get("given_name", ""),
+        last_name=userinfo.get("family_name", ""),
+        user_id=userinfo["sub"],  # This is the unique user ID from Keycloak
+    )
+
+
 # Add Keycloak middleware
 fastapi_logger.debug("Setting up Keycloak middleware")
 setup_keycloak_middleware(
@@ -64,6 +79,7 @@ setup_keycloak_middleware(
     add_swagger_auth=True,
     swagger_auth_scopes=["openid", "profile", "email"],
     exclude_patterns=["/openapi.json", "/docs"],
+    user_mapper=custom_user_mapper,
 )
 fastapi_logger.debug("Keycloak middleware setup complete")
 
@@ -89,8 +105,8 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root(user: User = Depends(get_user)):
-    return {"message": f"Hello, {user.name}!"}
+async def root(user: FastApiUser = Depends(get_user)):
+    return {"message": f"Hello, {user.display_name}!"}
 
 
 # After setting up the app and middleware
