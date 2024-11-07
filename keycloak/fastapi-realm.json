@@ -18,10 +18,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "${KEYCLOAK__CLIENT_SECRET}",
       "redirectUris": [
-        "http://${DATABASE__HOSTNAME}:8000/*"
+        "${FASTAPI_BASE_URL}/*"
       ],
       "webOrigins": [
-        "http://${DATABASE__HOSTNAME}:8000"
+        "${FASTAPI_BASE_URL}"
       ],
       "publicClient": false,
       "protocol": "openid-connect",
@@ -35,10 +35,10 @@
       "enabled": true,
       "publicClient": true,
       "redirectUris": [
-        "http://${DATABASE__HOSTNAME}:8000/docs/oauth2-redirect"
+        "${FASTAPI_BASE_URL}/docs/oauth2-redirect"
       ],
       "webOrigins": [
-        "http://${DATABASE__HOSTNAME}:8000"
+        "${FASTAPI_BASE_URL}"
       ],
       "protocol": "openid-connect",
       "attributes": {
